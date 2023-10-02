@@ -10,6 +10,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model requipment {
-  id Int @id @default(autoincrement())
+model Requipment {
+  id      Int                @id @default(autoincrement())
+  name    String
+  configs RequipmentConfig[]
+}
+
+model RequipmentConfig {
+  id           Int        @id @default(autoincrement())
+  key          String
+  value        String
+  requipmentId Int
+  equipment    Requipment @relation(fields: [requipmentId], references: [id])
 }
