@@ -2,18 +2,113 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas  = ["master", "production"]
+}
+
+// master data
+
+model BoM {
+  id         Int       @id @default(autoincrement())
+  code       String
+  name       String
+  product    Product   @relation(fields: [productId], references: [id])
+  productId  Int
+  material   Material  @relation(fields: [materialId], references: [id])
+  materialId Int
+  active     Boolean   @default(true)
+  status     String
+  createdBy  String?
+  updatedBy  String?
+  createdAt  DateTime?
+  deletedAt  DateTime?
+
+  @@schema("master")
+}
+
+model Material {
+  id        Int       @id @default(autoincrement())
+  products  Product[]
+  boms      BoM[]
+  active    Boolean   @default(true)
+  status    String
+  createdBy String?
+  updatedBy String?
+  createdAt DateTime?
+  deletedAt DateTime?
+
+  @@schema("master")
+}
+
+model Product {
+  id         Int             @id @default(autoincrement())
+  code       String
+  name       String
+  category   ProductCategory @relation(fields: [categoryId], references: [id])
+  categoryId Int
+  uom        UoM             @relation(fields: [uomId], references: [id])
+  uomId      Int
+  boms       BoM[]
+  material   Material?       @relation(fields: [materialId], references: [id])
+  materialId Int?
+  active     Boolean         @default(true)
+  status     String
+  createdBy  String?
+  updatedBy  String?
+  createdAt  DateTime?
+  deletedAt  DateTime?
+
+  @@schema("master")
+}
+
+model ProductCategory {
+  id        Int       @id @default(autoincrement())
+  code      String
+  name      String
+  products  Product[]
+  active    Boolean   @default(true)
+  status    String
+  createdBy String?
+  updatedBy String?
+  createdAt DateTime?
+  deletedAt DateTime?
+
+  @@schema("master")
+}
+
+model UoM {
+  id        Int       @id @default(autoincrement())
+  code      String
+  name      String
+  active    Boolean   @default(true)
+  status    String
+  createdBy String?
+  updatedBy String?
+  createdAt DateTime?
+  deletedAt DateTime?
+  products  Product[]
+
+  @@schema("master")
 }
 
 model Requipment {
-  id      Int                @id @default(autoincrement())
-  name    String
-  configs RequipmentConfig[]
+  id        Int                @id @default(autoincrement())
+  name      String
+  configs   RequipmentConfig[]
+  active    Boolean            @default(true)
+  status    String
+  createdBy String?
+  updatedBy String?
+  createdAt DateTime?
+  deletedAt DateTime?
+
+  @@schema("master")
 }
 
 model RequipmentConfig {
@@ -22,4 +117,12 @@ model RequipmentConfig {
   value        String
   requipmentId Int
   equipment    Requipment @relation(fields: [requipmentId], references: [id])
+  active       Boolean    @default(true)
+  status       String
+  createdBy    String?
+  updatedBy    String?
+  createdAt    DateTime?
+  deletedAt    DateTime?
+
+  @@schema("master")
 }

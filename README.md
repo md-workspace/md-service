@@ -10,3 +10,7 @@
 
 ### Run app
 - dev: `yarn dev`
+
+
+### Migration
+- `prisma migrate dev --name added_job_title`
